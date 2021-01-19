@@ -28,34 +28,36 @@ def start():
                         print(d[1], end='; ')
                     if str(d[2]) != 'nan':
                         part_id = db_utils.get_part_code_id(d[2])
+                        spr_detail_id = db_utils.add_spr_details(d[3], d[4])
                         if not part_id:
-                            part_id = db_utils.add_partcode(brand_id, d[2], d[7])
+                            part_id = db_utils.add_partcode(brand_id, d[2], d[7], spr_detail_id)
                         else:
-                            db_utils.update_partcode(brand_id, part_id, d[7])
-                        model_id = db_utils.get_model_id(re.sub('_parts\.csv', '', file))
-                        if part_id and model_id:
-                            module_id = db_utils.get_module_id_details(part_id, model_id)
-                            if not module_id:
-                                module_id = db_utils.add_module(d[1])
-                                spr_detail_id = db_utils.get_spr_details(d[3], d[4])
-                                if spr_detail_id:
-                                    db_utils.update_spr_details(spr_detail_id, d[3], d[4])
-                                else:
-                                    spr_detail_id = db_utils.add_spr_details(d[3], d[4])
-                                if part_id and model_id and module_id and spr_detail_id:
-                                    db_utils.add_details(part_id, model_id, module_id, spr_detail_id)
-                                else:
-                                    print('ERROR:', file)
-                                    print(d)
-                                    break
-                            else:
-                                db_utils.update_module(module_id, d[1])
-                                spr_detail_id = db_utils.get_details_spr_details(part_id, model_id, module_id)
-                                if spr_detail_id:
-                                    db_utils.update_spr_details(spr_detail_id, d[3], d[4])
-                                else:
-                                    spr_detail_id = db_utils.get_spr_details(d[3], d[4])
-                                    db_utils.add_details(part_id, model_id, module_id, spr_detail_id)
+                            db_utils.update_partcode(brand_id, part_id, d[7], spr_detail_id)
+                        # model_id = db_utils.get_model_id(re.sub('_parts\.csv', '', file))
+                        if part_id: # and model_id:
+                            pass
+                            # module_id = db_utils.get_module_id_details(part_id, model_id)
+                            # if not module_id:
+                            #     module_id = db_utils.add_module(d[1])
+                            #     spr_detail_id = db_utils.get_spr_details(d[3], d[4])
+                            #     if spr_detail_id:
+                            #         db_utils.update_spr_details(spr_detail_id, d[3], d[4])
+                            #     else:
+                            #         spr_detail_id = db_utils.add_spr_details(d[3], d[4])
+                            #     if part_id and model_id and module_id and spr_detail_id:
+                            #         db_utils.add_details(part_id, model_id, module_id, spr_detail_id)
+                            #     else:
+                            #         print('ERROR:', file)
+                            #         print(d)
+                            #         break
+                            # else:
+                            #     db_utils.update_module(module_id, d[1])
+                            #     spr_detail_id = db_utils.get_details_spr_details(part_id, model_id, module_id)
+                            #     if spr_detail_id:
+                            #         db_utils.update_spr_details(spr_detail_id, d[3], d[4])
+                            #     else:
+                            #         spr_detail_id = db_utils.get_spr_details(d[3], d[4])
+                            #         db_utils.add_details(part_id, model_id, module_id, spr_detail_id)
                         else:
                             print('ERROR:', file)
                             df = pandas.DataFrame([f"{file}"], )

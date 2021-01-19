@@ -154,17 +154,21 @@ def update_spr_details(spr_detail_id, name_ru, desc):
         db.i_request(f"UPDATE spr_details SET name_ru = '{name_ru}', description = NULL WHERE id = {spr_detail_id}")
 
 
-def update_partcode(brand_id, part_id, img):
+def update_partcode(brand_id, part_id, img, spr_detail_id):
     if str(img) != 'nan':
-        db.i_request(f"UPDATE partcodes SET manufacturer = {brand_id}, images = '{img}' WHERE id = {part_id}")
+        db.i_request(
+            f"UPDATE partcodes SET manufacturer = {brand_id}, images = '{img}', spr_detail_id = {spr_detail_id} "
+            f"WHERE id = {part_id}")
     else:
-        db.i_request(f"UPDATE partcodes SET manufacturer = {brand_id}, images = NULL WHERE id = {part_id}")
+        db.i_request(
+            f"UPDATE partcodes SET manufacturer = {brand_id}, images = NULL, spr_detail_id = {spr_detail_id} "
+            f"WHERE id = {part_id}")
 
 
-def add_partcode(brand_id, partcode, img):
+def add_partcode(brand_id, partcode, img, spr_detail_id):
     if str(img) != 'nan':
         q = db.i_request(f"WITH s as (SELECT id FROM partcodes "
-                         f"WHERE code = '{partcode}' AND manufacturer = {brand_id} ), i as "
+                         f"WHERE code = '{partcode}' AND manufacturer = {brand_id} AND spr_detail_id = {spr_detail_id}), i as "
                          f"(INSERT INTO partcodes (code, manufacturer, images) SELECT '{partcode}', {brand_id}, '{img}' "
                          f"WHERE NOT EXISTS (SELECT 1 FROM s) RETURNING id) SELECT id FROM i UNION ALL SELECT id FROM s")
     else:
