@@ -122,11 +122,11 @@ def add_spr_details(name_ru, desc):
         return 0
 
 
-def add_details(part_id, model_id, module_id, spr_detail_id):
+def add_details(part_id, model_id, module_id):
     q = db.i_request(f"WITH s as (SELECT id FROM details "
                      f"WHERE partcode_id = {part_id} AND model_id = {model_id} AND module_id = {module_id} ), i as "
-                     f"(INSERT INTO details (partcode_id, model_id, module_id, spr_detail_id) "
-                     f"SELECT {part_id}, {model_id}, {module_id}, {spr_detail_id} "
+                     f"(INSERT INTO details (partcode_id, model_id, module_id) "
+                     f"SELECT {part_id}, {model_id}, {module_id} "
                      f"WHERE NOT EXISTS (SELECT 1 FROM s) RETURNING id) SELECT id FROM i UNION ALL SELECT id FROM s")
     if q:
         return q[0][0]
@@ -182,13 +182,8 @@ def add_partcode(brand_id, partcode, img, spr_detail_id):
         return 0
 
 
-def get_spr_details(name_ru, desc):
-    if str(desc) != 'nan':
-        q = db.i_request(f"SELECT id FROM spr_details "
-                         f"WHERE name_ru = '{name_ru}' AND description = '{desc}'")
-    else:
-        q = db.i_request(f"SELECT id FROM spr_details "
-                         f"WHERE name_ru = '{name_ru}' AND description = NULL ")
+def get_spr_details(name_ru):
+    q = db.i_request(f"SELECT id FROM spr_details WHERE name_ru = '{name_ru}'")
     if q:
         return q[0][0]
     else:
@@ -201,3 +196,12 @@ def add_prices(price, vendor_id, part_id):
                  f"(INSERT INTO prices (price, vendor_id, partcode_id) "
                  f"SELECT {price}, {vendor_id}, {part_id} "
                  f"WHERE NOT EXISTS (SELECT 1 FROM s) RETURNING id) SELECT id FROM i UNION ALL SELECT id FROM s")
+
+
+def get_spr_details_name(spr_detail_id):
+    q = db.i_request(f"SELECT name_ru FROM spr_details WHERE id = {spr_detail_id}")
+    return q
+
+
+def get_modules_id(part_id, model_id):
+    return db.i_request(f"SELECT module_id FROM details WHERE model_id = {model_id} AND partcode_id = {part_id}")
