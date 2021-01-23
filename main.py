@@ -11,7 +11,9 @@ def main():
     # profit_msk.start()
     # fix_desc_partcodes.get_id_partcodes()
     # fix_files_partcodes.start()
-    db_parser.start()
+    # db_parser.start()
+    db_parser.linked_partcode_spr_diteils_is_null()
+    db_parser.generate_article_partcode()
 
 
 if __name__ == '__main__':

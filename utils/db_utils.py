@@ -205,3 +205,36 @@ def get_spr_details_name(spr_detail_id):
 
 def get_modules_id(part_id, model_id):
     return db.i_request(f"SELECT module_id FROM details WHERE model_id = {model_id} AND partcode_id = {part_id}")
+
+
+def get_all_partcode_spr_details_is_null():
+    return db.i_request(f"SELECT id FROM partcodes WHERE spr_detail_id IS NULL")
+
+
+def get_spr_detail_id_in_details(part_id):
+    q = db.i_request(f"SELECT model_id, spr_detail_id FROM details WHERE partcode_id = {part_id} LIMIT 1 OFFSET 0")
+    if q:
+        return q
+    else:
+        return 0
+
+
+def get_brand_id_in_models(model_id):
+    q = db.i_request(f"SELECT brand_id FROM models WHERE id = {model_id}")
+    if q:
+        return q[0][0]
+    else:
+        return 0
+
+
+def linked_partcode(part_id, brand_id, spr_detail_id):
+    db.i_request(f"UPDATE partcodes SET manufacturer = {brand_id}, spr_detail_id = {spr_detail_id} "
+                 f"WHERE id = {part_id}")
+
+
+def get_ids(param):
+    return db.i_request(f"SELECT id FROM {param}")
+
+
+def add_partcode_article(part_id, article_code):
+    db.i_request(f"UPDATE partcodes SET article_code = '{article_code}' WHERE id = {part_id}")

@@ -90,3 +90,49 @@ def fix_price(old_price):
     elif len(price) >= 6:
         old_price = re.sub(r'\d..$', '000', price)
     return old_price
+
+
+def linked_partcode_spr_diteils_is_null():
+    parts_list = db_utils.get_all_partcode_spr_details_is_null()
+    for part_id in parts_list:
+        if part_id:
+            print('partcode_id:', part_id[0])
+            brand_id = 0
+            model_id = 0
+            spr_detail_id = 0
+            try:
+                d = db_utils.get_spr_detail_id_in_details(part_id[0])
+                spr_detail_id = d[0][1]
+                if spr_detail_id:
+                    model_id = d[0][0]
+                    if model_id:
+                        brand_id = db_utils.get_brand_id_in_models(model_id)
+                        db_utils.linked_partcode(part_id[0], brand_id, spr_detail_id)
+            except:
+                print('partcode_id:', part_id[0], ', brand_id:', brand_id, ', model_id:', model_id,
+                      ', spr_detail_id:', spr_detail_id, ' --- ERROR')
+
+
+def generate_article_partcode():
+    s = ''
+    art = 'P400000000'
+    parts_list = db_utils.get_ids('partcodes')
+    for n, i in enumerate(parts_list):
+        n = n + 1
+        if n <= 9:
+            s = re.sub(rf'\d$', str(n), art)
+        elif (n >= 10) and (n <= 99):
+            s = re.sub(rf'\d.$', str(n), art)
+        elif (n >= 100) and (n <= 999):
+            s = re.sub(rf'\d..$', str(n), art)
+        elif (n >= 1000) and (n <= 9999):
+            s = re.sub(rf'\d...$', str(n), art)
+        elif (n >= 10000) and (n <= 99999):
+            s = re.sub(rf'\d....$', str(n), art)
+        elif (n >= 100000) and (n < 999999):
+            s = re.sub(rf'\d.....$', str(n), art)
+        elif n >= 1000000:
+            s = re.sub(rf'\d......$', str(n), art)
+        print(i[0], s)
+        db_utils.add_partcode_article(i[0], s)
+
