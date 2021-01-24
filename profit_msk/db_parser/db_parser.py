@@ -117,22 +117,42 @@ def generate_article_partcode():
     s = ''
     art = 'P400000000'
     parts_list = db_utils.get_ids('partcodes')
-    for n, i in enumerate(parts_list):
-        n = n + 1
-        if n <= 9:
-            s = re.sub(rf'\d$', str(n), art)
-        elif (n >= 10) and (n <= 99):
-            s = re.sub(rf'\d.$', str(n), art)
-        elif (n >= 100) and (n <= 999):
-            s = re.sub(rf'\d..$', str(n), art)
-        elif (n >= 1000) and (n <= 9999):
-            s = re.sub(rf'\d...$', str(n), art)
-        elif (n >= 10000) and (n <= 99999):
-            s = re.sub(rf'\d....$', str(n), art)
-        elif (n >= 100000) and (n < 999999):
-            s = re.sub(rf'\d.....$', str(n), art)
-        elif n >= 1000000:
-            s = re.sub(rf'\d......$', str(n), art)
+    for n, i in enumerate(parts_list, 1):
+        generate_article_code(n, art)
         print(i[0], s)
         db_utils.add_partcode_article(i[0], s)
+
+
+def linked_details_in_parcode():
+    art = 'P400000000'
+    details_list = db_utils.get_detail_id_is_not_partcode()
+    article_code_index = db_utils.get_max_article_code()
+    article_code_index = int(article_code_index.replace('P4', '')) + 1
+    for n, i in enumerate(details_list, article_code_index):
+        brand_id = db_utils.get_brand_id_in_models(i[1])
+        article_code = generate_article_code(n, art)
+        part_id = db_utils.add_partcode_article_manufacture_spr_details(article_code, brand_id, i[2])
+        if part_id:
+            db_utils.update_details_partcode(i[0], part_id)
+            print(article_code)
+
+
+def generate_article_code(n, art):
+    if n <= 9:
+        s = re.sub(rf'\d$', str(n), art)
+    elif (n >= 10) and (n <= 99):
+        s = re.sub(rf'\d.$', str(n), art)
+    elif (n >= 100) and (n <= 999):
+        s = re.sub(rf'\d..$', str(n), art)
+    elif (n >= 1000) and (n <= 9999):
+        s = re.sub(rf'\d...$', str(n), art)
+    elif (n >= 10000) and (n <= 99999):
+        s = re.sub(rf'\d....$', str(n), art)
+    elif (n >= 100000) and (n < 999999):
+        s = re.sub(rf'\d.....$', str(n), art)
+    elif n >= 1000000:
+        s = re.sub(rf'\d......$', str(n), art)
+    return s
+
+
 

@@ -6,8 +6,8 @@ con = psycopg2.connect(
     # user="part4_parser",
     user="part4",
     password="part4_GfhjkzYtn321",
-    # host="116.203.219.63",
-    host="localhost",
+    host="116.203.219.63",
+    # host="localhost",
     port="5432"
 )
 

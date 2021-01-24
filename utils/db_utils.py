@@ -238,3 +238,32 @@ def get_ids(param):
 
 def add_partcode_article(part_id, article_code):
     db.i_request(f"UPDATE partcodes SET article_code = '{article_code}' WHERE id = {part_id}")
+
+
+def get_detail_id_is_not_partcode():
+    return db.i_request(f"SELECT id, model_id, spr_detail_id FROM details "
+                        f"WHERE partcode_id IS NULL AND module_id IS NOT NULL")
+
+
+def get_max_article_code():
+    q = db.i_request(f"SELECT article_code FROM partcodes ORDER BY article_code DESC")
+    if q:
+        return q[0][0]
+    else:
+        return 0
+
+
+def add_partcode_article_manufacture_spr_details(article_code, brand_id, spr_detail_id):
+    q = db.i_request(f"WITH s as (SELECT id FROM partcodes "
+                     f"WHERE article_code = '{article_code}' AND manufacturer = {brand_id} AND spr_detail_id = {spr_detail_id}), i as "
+                     f"(INSERT INTO partcodes (code, article_code, manufacturer, spr_detail_id) "
+                     f"SELECT '{article_code}', '{article_code}', {brand_id}, {spr_detail_id} "
+                     f"WHERE NOT EXISTS (SELECT 1 FROM s) RETURNING id) SELECT id FROM i UNION ALL SELECT id FROM s")
+    if q:
+        return q[0][0]
+    else:
+        return 0
+
+
+def update_details_partcode(detail_id, part_id):
+    db.i_request(f"UPDATE details SET partcode_id = {part_id} WHERE id = {detail_id}")

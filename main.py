@@ -14,6 +14,7 @@ def main():
     # db_parser.start()
     db_parser.linked_partcode_spr_diteils_is_null()
     db_parser.generate_article_partcode()
+    db_parser.linked_details_in_parcode()
 
 
 if __name__ == '__main__':
